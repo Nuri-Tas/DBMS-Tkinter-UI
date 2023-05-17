@@ -7,7 +7,7 @@ The default MYSQL connection credentials are given below and they shall be chang
     user="root",
     password="nuri",
     database="movie_db"
-)`
+).`
 
 `createTables.sql` and `insertTables.sql` files must be run to set up the database. The default name of the database is `movie_db`.
 
