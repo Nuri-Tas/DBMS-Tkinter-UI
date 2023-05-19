@@ -2,25 +2,35 @@ from tkinter import *
 from tkinter.ttk import *
 from tkinter import messagebox, ttk
 import mysql.connector
+import os
+
+
 
 mydb = mysql.connector.connect(
     host="127.0.0.1",
     user="root",
-    password="Devrim1-",
-    database="new_schema"
+    password="nuri",
+    database="movie_db2"
 )
 
+
 def validate_login_director(username, password):
-    # fetch database manager credentials
+    # fetch user credentials
     cursor = mydb.cursor()
     sql = "select * from users"
     cursor.execute(sql)
     users = cursor.fetchall()
 
-    # Check if the manager username and password are valid
+    # fetch director usernames to check if the given user is a director
+    direct_sql = "select username from director"
+    cursor.execute(direct_sql)
+    director_usernames = [item[0] for item in cursor.fetchall()]
+
+    # Check if the director username and password are valid
     for user in users:
-        if username == user[0] and password == user[1]:
+        if username == user[0] and password == user[1] and username in director_usernames:
                 messagebox.showinfo("Login", "Login Successful!")
+                os.environ["DIRECTOR_USERNAME"] = username
                 return directoroptions()
     messagebox.showerror("Login", "Invalid username or password")
 
@@ -44,7 +54,7 @@ def directoroptions():
                                           command=viewaudienceticket)
     updatemovienamebutton = Button(optionpage,
                                   text="Update Movie Name",
-                                   command=updatemoviename)
+                                   command=open_updatemoviename)
     listtheatrebutton.pack(pady=10)
     addmoviebutton.pack(pady=10)
     addpredecessorbutton.pack(pady=10)
@@ -130,8 +140,11 @@ def viewaudienceticket():
     entry_movieid = Entry(form_window)
     entry_movieid.pack()
 
+
+
 #update moviename ui
-def updatemoviename():
+def open_updatemoviename():
+    cursor = mydb.cursor()
     form_window = Toplevel()
     form_window.title("Update Movie Name")
     form_window.geometry("400x400")
@@ -146,12 +159,21 @@ def updatemoviename():
     entry_newname = Entry(form_window)
     entry_newname.pack()
 
+    btn_update_movie_name= Button(form_window, text=f"Update Movie Name",
+                                  command=lambda : update_moviename(entry_movieid.get(), entry_newname.get()))
+    btn_update_movie_name.pack()
 
-
-
-
-
-
-
-
-
+def update_moviename(movie_id, movie_name):
+    cursor = mydb.cursor()
+    # check if the given movie id belongs to the director who logged in the system
+    director_username = os.environ.get("DIRECTOR_USERNAME")
+    sql = "select movie_id from Movie where username = %s"
+    cursor.execute(sql, (director_username,))
+    movie_ids = [str(item[0]) for item in cursor.fetchall()]
+    if movie_id in movie_ids:
+        sql = "UPDATE Movie SET movie_name = %s where movie_id = %s"
+        cursor.execute(sql, (movie_name, movie_id))
+        mydb.commit()
+        messagebox.showinfo("Database", "The movie name has changed successfully!")
+    else:
+        messagebox.showerror("Database", f"The movie id {movie_id} belongs to another director!")

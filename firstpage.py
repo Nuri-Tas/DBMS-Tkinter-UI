@@ -1,4 +1,3 @@
-
 # This will import all the widgets
 # and modules which are available in
 # tkinter and ttk module
@@ -6,17 +5,17 @@ from tkinter import *
 from tkinter.ttk import *
 from tkinter import messagebox
 import mysql.connector
-from dbmanageroperations import dbmanageroptions
+from dbmanageroperations2 import dbmanageroptions
 from directoroperations import validate_login_director
 from audienceoperations import validate_login_audience
+import os
 
 mydb = mysql.connector.connect(
     host="127.0.0.1",
     user="root",
-    password="Devrim1-",
-    database="new_schema"
+    password="nuri",
+    database="movie_db2"
 )
-
 
 
 def validate_login(username, password):
@@ -77,7 +76,6 @@ def dbWindow():
 
 
 
-
 def directorwindow():
     newWindow = Toplevel(master)
     newWindow.title("Director UI")
@@ -97,7 +95,6 @@ def directorwindow():
                          text="Login",
                          command=lambda: validate_login_director(entry_username.get(), entry_password.get()))
     loginbutton.pack()
-
 
 
 def audiencewindow():
@@ -140,11 +137,11 @@ btndirector = Button(master,
              command= directorwindow)
 btndirector.pack(pady= 10)
 
+
 btnaudience = Button(master,
                      text= "Audience",
                      command=audiencewindow)
 btnaudience.pack(pady=10)
-
 
 
 # mainloop, runs infinitely

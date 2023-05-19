@@ -30,7 +30,8 @@ def dbmanageroptions():
                                 text="View Audience Ratings",
                                 command=open_rating_audience)
     viewmoviesofdirector = Button(optionpage,
-                                  text="View Movies of Director")
+                                  text="View Movies of Director",
+                                  command=open_directors_movies)
     viewavgrating = Button(optionpage,
                            text="View Average Rating of a Movie",
                            command=open_average_rating)
@@ -362,3 +363,74 @@ def average_rating(movie_id):
     except:
         messagebox.showerror("Database", f"Invalid Movie ID!")
 
+def open_directors_movies():
+    form_window = Toplevel()
+    form_window.title( "View All Movies of a Director")
+    form_window.geometry("400x400")
+
+    lbl_username = Label(form_window, text="Director Username:")
+    lbl_username.pack()
+    entry_username = Entry(form_window)
+    entry_username.pack()
+
+    btn_directors_movies = Button(form_window, text=f"View All Movies", command=lambda : view_directors_movies(entry_username.get()))
+    btn_directors_movies.pack()
+
+
+
+#Function to delete audience
+def view_directors_movies(directors_username):
+    cursor = mydb.cursor()
+    # get all movie id's of the given author
+    sql = "select movie_id, movie_name from Movie where username = %s"
+    cursor.execute(sql, (directors_username, ))
+    movie_ids_names = cursor.fetchall()
+    for idx, movie_id in enumerate(movie_ids_names):
+        movie_id = movie_ids_names[idx][0]
+        # get session id to fetch the theatre id and other attributes
+        sql = "select session_id from screens_as where movie_id = %s"
+        cursor.execute(sql, (movie_id, ))
+        session_id = cursor.fetchall()[0]
+
+        # add theatre id
+        sql = "select theatre_id, time_slot from Movie_Sessions where session_id = %s"
+        cursor.execute(sql, (session_id[0], ))
+        theatre_id, time_slot = cursor.fetchall()[0]
+        movie_ids_names[idx] += (theatre_id, )
+
+        # add theatre district
+        sql = "select theatre_district from Theatre where theatre_id = %s"
+        cursor.execute(sql, (theatre_id, ))
+        theatre_district = cursor.fetchall()[0]
+        movie_ids_names[idx] += (theatre_district, )
+        movie_ids_names[idx] += (time_slot, )
+
+
+    myview = Toplevel()
+    trv = ttk.Treeview(myview, selectmode="browse")
+    trv.grid(row=1, column=1, padx=20, pady=20)
+
+    # number of columns
+    trv["columns"] = ("1", "2", "3", "4", "5")
+
+    # Defining heading
+    trv['show'] = 'headings'
+
+    # width of columns and alignment
+    trv.column("1", width=80, anchor='c')
+    trv.column("2", width=100, anchor='c')
+    trv.column("3", width=80, anchor='c')
+    trv.column("4", width=100, anchor='c')
+    trv.column("5", width=80, anchor='c')
+    # Headings
+    # respective columns
+    trv.heading("1", text="movie_id")
+    trv.heading("2", text="movie_name")
+    trv.heading("3", text="theatre_id")
+    trv.heading("4", text="district")
+    trv.heading("5", text="time_slot")
+
+    for i in movie_ids_names:
+        trv.insert("", 'end', iid=i[0], text=i[0],
+                   values=i)
+    myview.mainloop()
