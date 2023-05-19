@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter.ttk import *
 from tkinter import messagebox, ttk
 import mysql.connector
+import os 
 
 mydb = mysql.connector.connect(
     host="127.0.0.1",
@@ -26,6 +27,7 @@ def validate_login_director(username, password):
     for user in users:
         if username == user[0] and password == user[1] and username in director_usernames:
                 messagebox.showinfo("Login", "Login Successful!")
+                os.environ["DIRECTOR_USERNAME"] = username
                 return directoroptions()
     messagebox.showerror("Login", "Invalid username or password")
 
