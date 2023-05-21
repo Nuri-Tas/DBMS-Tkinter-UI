@@ -2,31 +2,28 @@ from tkinter import *
 from tkinter.ttk import *
 from tkinter import messagebox, ttk
 import mysql.connector
-import os
-
-
+import os 
 
 mydb = mysql.connector.connect(
     host="127.0.0.1",
     user="root",
-    password="nuri",
-    database="movie_db2"
+    password="Devrim1-",
+    database="new_schema"
 )
 
-
 def validate_login_director(username, password):
-    # fetch user credentials
+    # fetch database manager credentials
     cursor = mydb.cursor()
     sql = "select * from users"
     cursor.execute(sql)
     users = cursor.fetchall()
-
+    
     # fetch director usernames to check if the given user is a director
     direct_sql = "select username from director"
     cursor.execute(direct_sql)
     director_usernames = [item[0] for item in cursor.fetchall()]
 
-    # Check if the director username and password are valid
+    # Check if the manager username and password are valid
     for user in users:
         if username == user[0] and password == user[1] and username in director_usernames:
                 messagebox.showinfo("Login", "Login Successful!")
@@ -141,6 +138,18 @@ def viewaudienceticket():
     entry_movieid.pack()
 
 
+#view audience ticket ui
+def viewaudienceticket():
+    form_window = Toplevel()
+    form_window.title("Audience Tickets")
+    form_window.geometry("400x400")
+
+    lbl_movieid = Label(form_window, text="Movie_ID")
+    lbl_movieid.pack()
+    entry_movieid = Entry(form_window)
+    entry_movieid.pack()
+
+
 
 #update moviename ui
 def open_updatemoviename():
@@ -177,3 +186,14 @@ def update_moviename(movie_id, movie_name):
         messagebox.showinfo("Database", "The movie name has changed successfully!")
     else:
         messagebox.showerror("Database", f"The movie id {movie_id} belongs to another director!")
+
+
+
+
+
+
+
+
+
+
+

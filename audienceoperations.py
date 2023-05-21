@@ -1,14 +1,14 @@
-import os
 from tkinter import *
 from tkinter.ttk import *
 from tkinter import messagebox, ttk
 import mysql.connector
+import os 
 
 mydb = mysql.connector.connect(
     host="127.0.0.1",
     user="root",
-    password="nuri",
-    database="movie_db2"
+    password="Devrim1-",
+    database="new_schema"
 )
 
 def validate_login_audience(username, password):
@@ -17,7 +17,7 @@ def validate_login_audience(username, password):
     sql = "select * from users"
     cursor.execute(sql)
     users = cursor.fetchall()
-
+    
     # fetch director usernames to check if the given user is a director
     direct_sql = "select username from audience"
     cursor.execute(direct_sql)
@@ -37,13 +37,13 @@ def audienceoptions():
     optionpage.geometry("400x400")
     listmoviebutton = Button(optionpage,
                            text="List All Movies",
-                             command=view_all_movies)
+                            command=view_all_movies)
     buymoviebutton = Button(optionpage,
                                   text="Buy Movie Ticket",
                             command=buymovieticket)
     viewticketbutton = Button(optionpage,
                                   text="View Bought Tickets",
-                              command=view_bought_tickets)
+                             command=view_bought_tickets)
     listmoviebutton.pack(pady=10)
     buymoviebutton.pack(pady=10)
     viewticketbutton.pack(pady=10)
@@ -58,7 +58,6 @@ def buymovieticket():
     lbl_sessid.pack()
     entry_sessid = Entry(form_window)
     entry_sessid.pack()
-
 
 def view_all_movies():
     cursor = mydb.cursor()
@@ -216,4 +215,4 @@ def view_bought_tickets():
     for i in results:
         trv.insert("", 'end', iid=i[0], text=i[0],
                    values=i)
-    myview.mainloop()
+    myview.mainloop()    
