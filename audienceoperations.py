@@ -18,12 +18,12 @@ def validate_login_audience(username, password):
     cursor.execute(sql)
     users = cursor.fetchall()
     
-    # fetch director usernames to check if the given user is a director
+    # fetch audience usernames to check if the given user is an audience
     direct_sql = "select username from audience"
     cursor.execute(direct_sql)
     audience_usernames = [item[0] for item in cursor.fetchall()]
 
-    # Check if the manager username and password are valid
+    # Check if the audience username and password are valid
     for user in users:
         if username == user[0] and password == user[1] and username in audience_usernames:
                 messagebox.showinfo("Login", "Login Successful!")
