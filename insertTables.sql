@@ -77,20 +77,16 @@ VALUES
   (80005, 'Thriller'),
   (80006, 'Drama');
   
-
- 
+  
 INSERT INTO has_genre(movie_id, genre_id)
 VALUES
 (20001, 80001),
-(20001, 80002),
-(20001, 80006),
-(20002, 80003),
+(20001, 80003),
 (20002, 80002),
-(20002, 80005),
-(20003, 80001),
-(20003, 80002),
 (20003, 80006),
 (20004, 80001),
+(20004, 80002),
+(20004, 80003),
 (20005, 80002),
 (20006, 80006);
 
@@ -116,7 +112,8 @@ VALUES
 (40002, "Sisli", "Sisli_2", 600),
 (40003, "Besiktas", "Besiktas_1", 500),
 (40004, "Besiktas", "Besiktas_2", 800),
-(40005, "Besiktas", "Besiktas_3", 900);
+(40005, "Besiktas", "Besiktas_3", 900),
+(40006, "Besiktas", "Besiktas_4", 1);
 
 
 INSERT INTO Movie_Sessions (session_id, time_slot, _date, theatre_id)
@@ -132,7 +129,7 @@ VALUES
 (50009, 1, STR_TO_DATE('3/17/23', '%m/%d/%y') , 40001), 
 (50010, 2, STR_TO_DATE('3/17/23', '%m/%d/%y') , 40001), 
 (50011, 3, STR_TO_DATE('3/17/23', '%m/%d/%y') , 40002), 
-(50012, 4, STR_TO_DATE('3/17/23', '%m/%d/%y') , 40002);
+(50012, 1, STR_TO_DATE('3/17/23', '%m/%d/%y') , 40006);
 
 
 INSERT INTO screens_as (movie_id, session_id)
@@ -142,6 +139,7 @@ VALUES
 (20003, 50003),
 (20004, 50004),
 (20006, 50005),
+(20006, 50006),
 (20005, 50007),
 (20002, 50008),
 (20001, 50009),
@@ -151,24 +149,22 @@ VALUES
 
 
 
+
 INSERT INTO bought_tickets (username, session_id)
 VALUES 
 ("arzucan.ozgur", 50001),
 ("arzucan.ozgur", 50002),
 ("arzucan.ozgur", 50004),
-("egemen.isguder", 50003),
+("egemen.isguder", 50004),
 ("egemen.isguder", 50005),
 ("busra.oguzoglu", 50006),
-("busra.oguzoglu", 50007),
-("busra.oguzoglu", 50008);
+("busra.oguzoglu", 50012);
 
-  
+
 INSERT INTO database_managers (username, _password)
 VALUES
   ("m1", "p1"),	
   ('manager1', 'managerpass1'),
   ('manager2', 'managerpass2'),
   ('manager35', 'managerpass35');
-
-
-select * from users;
+  

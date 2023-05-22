@@ -204,59 +204,61 @@ CREATE TABLE Bought_tickets(
     -- cant have the same person book the same session twice so I made this constraint
 );
 
-/* Trigger for theatre capacity
+-- trigger to check if a theatre has available seating capacity for a given session
 DELIMITER $$
-CREATE TRIGGER theatre_capacity_check
-BEFORE INSERT ON Bought_tickets
-FOR EACH ROW
-BEGIN 
-    DECLARE session_id INT;
-	DECLARE theatre_id INT; 
-	DECLARE theatre_capacity INT;
-    DECLARE reserved_capacity INT;
-    
-    INSERT 
-
-*/
-
-
-/* 
-This trigger is commented out as it still misses predecessors 
-
-drop trigger if exists check_predecessor_watch;
-
---- create a trigger to ensure an audience can buy tickets to a movie if she watched the predecessor of the movie, if any
-DELIMITER $$
-CREATE TRIGGER check_predecessor_watch
+CREATE TRIGGER check_available_seats
 BEFORE INSERT ON Bought_tickets
 FOR EACH ROW
 BEGIN
-    DECLARE proceeding_id INT;
-    DECLARE predecessing_id INT;
-    DECLARE predecessor_watched INT;
+    DECLARE available_seats INT;
+    DECLARE msg VARCHAR(128);
     
-    select movie_id into proceeding_id
-    from bought_tickets b
-	join (select distinct session_id as pred_session_id, s.movie_id  from screens_as s
-			join predecessors p on p.movie_id = s.movie_id) combined on combined.pred_session_id = b.session_id;
-    
-    select distinct predecessor_id into predecessing_id
-    from predecessors where movie_id = proceeding_id;
+    SELECT (theatre_capacity - COUNT(*))
+    INTO available_seats
+    FROM Bought_tickets
+    INNER JOIN Movie_Sessions ON Bought_tickets.session_id = Movie_Sessions.session_id
+    INNER JOIN Theatre ON Movie_Sessions.theatre_id = Theatre.theatre_id
+    WHERE Bought_tickets.session_id = NEW.session_id
+    GROUP BY Theatre.theatre_capacity;
 
-	select count(movie_id) into predecessor_watched from bought_tickets b
-	join (select distinct session_id as pred_session_id, s.movie_id  from screens_as s
-		join predecessors p on p.predecessor_id = s.movie_id AND s.movie_id = predecessor_id) 
-	combined on combined.pred_session_id = b.session_id and b.username = NEW.username;
-    
-    
-    IF proceeding_id > 0 AND predecessor_watched = 0  THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'User has not watched the predecessor of the movie';
+    IF available_seats <= 0 THEN
+		set MSG = 'There are no available seats in the theatre!';
+        signal sqlstate '45000' set message_text = msg;
     END IF;
-END$$
+END $$
 DELIMITER ;
 
-*/
+drop trigger if exists check_predecessors;
+
+-- trigger to check if the given audience has watched all the predecessors of a movie she wants to buy a ticket for
+DELIMITER $$
+CREATE TRIGGER check_predecessors
+BEFORE INSERT ON Bought_tickets
+FOR EACH ROW
+BEGIN
+	DECLARE new_movie_id INT;
+    DECLARE predecessor_movie_id INT;
+    DECLARE count_watched INT;
+	DECLARE MSG VARCHAR(128);
+    
+    SELECT movie_id INTO new_movie_id  FROM screens_as
+    WHERE screens_as.session_id = NEW.session_id;
+    
+    SELECT predecessor_id INTO predecessor_movie_id FROM predecessors
+    WHERE predecessors.movie_id = new_movie_id;
+    
+    IF (predecessor_movie_id IS NOT NULL) AND NOT EXISTS (select username from bought_tickets 
+			   where bought_tickets.username = NEW.username and bought_tickets.session_id 
+               in ( SELECT session_id FROM screens_as
+					WHERE screens_as.movie_id = predecessor_movie_id)) 
+		THEN
+		set MSG = 'All predecessors, if any, of a movie must be watched before buying a new ticket for the new movie!';
+		signal sqlstate '45000' set message_text = msg;
+    END IF;
+END $$
+DELIMITER ;
+    
+   
 
 CREATE TABLE Database_Managers(
 	username VARCHAR(20),

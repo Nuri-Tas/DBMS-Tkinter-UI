@@ -7,8 +7,8 @@ import os
 mydb = mysql.connector.connect(
     host="127.0.0.1",
     user="root",
-    password="Devrim1-",
-    database="new_schema"
+    password="nuri",
+    database="movie_db2"
 )
 
 def validate_login_audience(username, password):
@@ -40,7 +40,7 @@ def audienceoptions():
                             command=view_all_movies)
     buymoviebutton = Button(optionpage,
                                   text="Buy Movie Ticket",
-                            command=buymovieticket)
+                            command=open_buymovieticket)
     viewticketbutton = Button(optionpage,
                                   text="View Bought Tickets",
                              command=view_bought_tickets)
@@ -49,7 +49,7 @@ def audienceoptions():
     viewticketbutton.pack(pady=10)
 
 #buy movie ticket ui
-def buymovieticket():
+def open_buymovieticket():
     form_window = Toplevel()
     form_window.title("Buy Ticket")
     form_window.geometry("400x400")
@@ -58,6 +58,23 @@ def buymovieticket():
     lbl_sessid.pack()
     entry_sessid = Entry(form_window)
     entry_sessid.pack()
+
+    btn_buymovieticket = Button(form_window, text="Buy Movie Ticket", command=lambda : buymovieticket(entry_sessid.get()))
+    btn_buymovieticket.pack()
+
+
+def buymovieticket(session_id):
+    cursor = mydb.cursor()
+    audience_username = os.environ["AUDIENCE_USERNAME"]
+    try:
+        sql = "insert into bought_tickets(username, session_id) values (%s, %s)"
+        values = (audience_username, session_id)
+        cursor.execute(sql, values)
+        mydb.commit()
+        messagebox.showinfo("Login", "Login Successful!")
+    except mysql.connector.Error as err:
+        messagebox.showerror("Login", err)
+
 
 def view_all_movies():
     cursor = mydb.cursor()
