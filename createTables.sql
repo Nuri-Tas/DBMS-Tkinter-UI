@@ -25,13 +25,16 @@ CREATE TABLE Rating_Platform (
     PRIMARY KEY (platform_id)
 );
 
+
+
 CREATE TABLE Subscribed_Platforms(
 	username VARCHAR(20),
     platform_id INTEGER(20),
     FOREIGN KEY (username)
 		REFERENCES Audience(username)
         ON DELETE CASCADE,
-	FOREIGN KEY (platform_id) REFERENCES Rating_platform(platform_id)
+	FOREIGN KEY (platform_id) REFERENCES Rating_platform(platform_id),
+    PRIMARY KEY (username, platform_id)
 );
 
 
@@ -49,6 +52,8 @@ CREATE TABLE Director(
 );
 
 
+
+
 CREATE TABLE Movie(
 	movie_id INTEGER(20),
     movie_name VARCHAR(50) NOT NULL,
@@ -61,7 +66,7 @@ CREATE TABLE Movie(
 	-- the platform id of the movie should be the same as the director's platform id 
     FOREIGN KEY (username, platform_id) REFERENCES Director(username, platform_id) ON DELETE CASCADE,
     -- movies platform is the same as the directors
-	PRIMARY KEY (movie_id)
+	PRIMARY KEY (movie_id, username)
 );
 
 
@@ -71,8 +76,9 @@ CREATE TABLE Predecessors(
     movie_id INTEGER(20),
     FOREIGN KEY (movie_id)
 		REFERENCES Movie(movie_id)
-        ON DELETE CASCADE
+        ON DELETE CASCADE,
 	-- I figured if the movie gets deleted then everything related to it should be as well
+    PRIMARY KEY(predecessor_id, movie_id)
 );
 
 CREATE TABLE Genre_list(
@@ -90,13 +96,15 @@ CREATE TABLE has_genre(
 		REFERENCES Movie(movie_id)
 		ON DELETE CASCADE,
 	-- if a movie no longer exists in the platform we shouldnt keep the genre information
-    FOREIGN KEY (genre_id) REFERENCES Genre_list(genre_id)
+    FOREIGN KEY (genre_id) REFERENCES Genre_list(genre_id),
+    PRIMARY KEY (movie_id, genre_id)
 );
+
 
 -- create a trigger for has genre to ensure all movies have at least one genre
 DELIMITER $$
 CREATE TRIGGER check_movie_count AFTER INSERT
-ON Movie FOR EACH ROW
+ON has_genre FOR EACH ROW
 
 BEGIN
   DECLARE movie_count INT;
@@ -106,7 +114,7 @@ BEGIN
   SELECT COUNT(DISTINCT movie_id) INTO movie_count FROM Movie;
   SELECT COUNT(DISTINCT movie_id) INTO has_genre_count FROM has_genre;
   
-  IF movie_count > has_genre_count THEN
+  IF has_genre_count > movie_count THEN
 		set msg = 'has genre must include all movie ids in the Movie table';
         signal sqlstate '45000' set message_text = msg;
   end IF;
@@ -196,6 +204,21 @@ CREATE TABLE Bought_tickets(
     -- cant have the same person book the same session twice so I made this constraint
 );
 
+/* Trigger for theatre capacity
+DELIMITER $$
+CREATE TRIGGER theatre_capacity_check
+BEFORE INSERT ON Bought_tickets
+FOR EACH ROW
+BEGIN 
+    DECLARE session_id INT;
+	DECLARE theatre_id INT; 
+	DECLARE theatre_capacity INT;
+    DECLARE reserved_capacity INT;
+    
+    INSERT 
+
+*/
+
 
 /* 
 This trigger is commented out as it still misses predecessors 
@@ -237,6 +260,7 @@ DELIMITER ;
 
 CREATE TABLE Database_Managers(
 	username VARCHAR(20),
-    _password VARCHAR(20)
+    _password VARCHAR(20),
+    PRIMARY KEY (username)
 );
 
