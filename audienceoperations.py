@@ -71,9 +71,9 @@ def buymovieticket(session_id):
         values = (audience_username, session_id)
         cursor.execute(sql, values)
         mydb.commit()
-        messagebox.showinfo("Login", "Login Successful!")
+        messagebox.showinfo("Buy Ticket", f"The ticket for the session id {session_id} has been bought successfully!")
     except mysql.connector.Error as err:
-        messagebox.showerror("Login", err)
+        messagebox.showerror("Buy Ticket", err)
 
 
 def view_all_movies():
@@ -153,7 +153,7 @@ def view_all_movies():
     # respective columns
     trv.heading("1", text="movie_id")
     trv.heading("2", text="movie_name")
-    trv.heading("3", text="director's username")
+    trv.heading("3", text="director's surname")
     trv.heading("4", text="platform id")
     trv.heading("5", text="theatre_id")
     trv.heading("6", text="time_slot")
@@ -196,10 +196,13 @@ def view_bought_tickets():
             rating = "NULL"
         new_row.append(rating)
 
-        # get overall rating of the film
+        # get overall rating of the film - overall rating can be null as well
         sql = "select average_rating from average_ratings where movie_id = %s"
         cursor.execute(sql, (movie_id, ))
-        avg_rating = cursor.fetchall()[0][0]
+        try:
+            avg_rating = cursor.fetchall()[0][0]
+        except:
+            avg_rating = "NULL"
         new_row.append(avg_rating)
 
         results.append(new_row)
