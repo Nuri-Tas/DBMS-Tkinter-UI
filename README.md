@@ -30,4 +30,7 @@ mydb = mysql.connector.connect(
 ).
 ```
 
+It suffices to run only the `firstpage.py` to open the UI after setting up the database and altering the `PASSWORD` and `DATABASE` variables accordingly on each .py file:
+
+`{path_to_the_directory} python firstpage.py`
 
