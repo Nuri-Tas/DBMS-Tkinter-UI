@@ -37,11 +37,14 @@ VALUES
 ("egemen.isguder", "10130"),
 ("egemen.isguder", "10131"),
 ("egemen.isguder", "10133"),
-("busra.oguzoglu", "10130"),
 ("busra.oguzoglu", "10132"),
 ("busra.oguzoglu", "10133"),
 ("busra.oguzoglu", "10134");
 
+
+INSERT INTO Subscribed_Platforms (username, platform_id)
+VALUES 
+("busra.oguzoglu", "10131");
 
 INSERT INTO Director (username, nationality, platform_id)
 VALUES 
@@ -91,21 +94,6 @@ VALUES
 (20006, 80006);
 
 
-INSERT INTO Ratings (username, movie_id, rating)
-VALUES 
-("arzucan.ozgur", 20001, 4.5),
-("arzucan.ozgur", 20002, 5),
-("arzucan.ozgur", 20003, 4),
-("egemen.isguder", 20003, 3.5),
-("egemen.isguder", 20004, 4.5),
-("egemen.isguder", 20005, 4),
-("busra.oguzoglu", 20002, 4),
-("busra.oguzoglu", 20003, 5),
-("busra.oguzoglu", 20004, 2);
-
--- no need to insert values into average ratings table as it will be automatically created as values are inserted into Ratings
-select * from Average_Ratings;
-
 INSERT INTO Theatre (theatre_id, theatre_district, theatre_name, theatre_capacity)
 VALUES
 (40001, "Sisli", "Sisli_1", 300),
@@ -127,38 +115,64 @@ VALUES
 (50007, 1, STR_TO_DATE('3/16/23', '%m/%d/%y') , 40002), 
 (50008, 3, STR_TO_DATE('3/16/23', '%m/%d/%y') , 40002),  
 (50009, 1, STR_TO_DATE('3/17/23', '%m/%d/%y') , 40001), 
-(50010, 2, STR_TO_DATE('3/17/23', '%m/%d/%y') , 40001), 
+(50010, 3, STR_TO_DATE('3/17/23', '%m/%d/%y') , 40001), 
 (50011, 3, STR_TO_DATE('3/17/23', '%m/%d/%y') , 40002), 
 (50012, 1, STR_TO_DATE('3/17/23', '%m/%d/%y') , 40006);
 
 
 INSERT INTO screens_as (movie_id, session_id)
 VALUES
-(20001, 50001),
-(20002, 50002),
-(20003, 50003),
+(20001, 50001);
+
+INSERT INTO screens_as (movie_id, session_id)
+VALUES
+(20002, 50002);
+
+INSERT INTO screens_as (movie_id, session_id)
+VALUES
+(20003, 50003);
+
+INSERT INTO screens_as (movie_id, session_id)
+VALUES
 (20004, 50004),
-(20006, 50005),
+(20005, 50005),
 (20006, 50006),
-(20005, 50007),
+(20001, 50007),
 (20002, 50008),
-(20001, 50009),
-(20005, 50010),
+(20002, 50009),
+(20003, 50010),
 (20004, 50011),
-(20006, 50012);
-
-
+(20005, 50012);
 
 
 INSERT INTO bought_tickets (username, session_id)
 VALUES 
 ("arzucan.ozgur", 50001),
 ("arzucan.ozgur", 50002),
+("arzucan.ozgur", 50003),
 ("arzucan.ozgur", 50004),
 ("egemen.isguder", 50004),
 ("egemen.isguder", 50005),
-("busra.oguzoglu", 50006),
-("busra.oguzoglu", 50012);
+("busra.oguzoglu", 50004),
+("busra.oguzoglu", 50006);
+
+
+select * from predecessors;
+
+INSERT INTO Ratings (username, movie_id, rating)
+VALUES 
+("arzucan.ozgur", 20001, 4.5),
+("arzucan.ozgur", 20002, 5),
+("arzucan.ozgur", 20003, 4),
+("egemen.isguder", 20004, 5),
+("egemen.isguder", 20005, 4);
+
+INSERT INTO Ratings (username, movie_id, rating)
+VALUES 
+("busra.oguzoglu", 20004, 4.5);
+
+-- no need to insert values into average ratings table as it will be automatically created as values are inserted into Ratings
+select * from Average_Ratings;
 
 
 INSERT INTO database_managers (username, _password)

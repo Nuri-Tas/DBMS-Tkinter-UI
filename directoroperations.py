@@ -5,11 +5,14 @@ from tkinter.ttk import *
 from tkinter import messagebox, ttk
 import mysql.connector
 
+PASSWORD = "nuri"
+DATABASE_NAME = "movie_db2"
+
 mydb = mysql.connector.connect(
     host="127.0.0.1",
     user="root",
-    password="Devrim1-",
-    database="new_schema"
+    password=PASSWORD,
+    database=DATABASE_NAME
 )
 
 def validate_login_director(username, password):
@@ -276,6 +279,11 @@ def add_movie(movie_id, movie_name, genrelist, duration, theatre_id, moviedate, 
                                         if countavailable[0][0] != 0:
                                             messagebox.showerror("Availability error", "Theatre is booked on those dates and slot")
                                         else:
+                                            # I moved auto-increment part out of the try-except block to keep increasing session ids
+                                            sessid = "SELECT max(session_id) FROM screens_as"
+                                            cursor.execute(sessid)
+                                            a = cursor.fetchall()
+                                            session_id = a[-1][0] + 1
                                             try:
                                                 # insert into movie table
                                                 cursor = mydb.cursor()
@@ -309,11 +317,11 @@ def add_movie(movie_id, movie_name, genrelist, duration, theatre_id, moviedate, 
                                                     mydb.commit()
                                                 # insert into movie sessions
                                                 cursor = mydb.cursor()
-                                                sessid = "SELECT session_id FROM screens_as"
-                                                cursor.execute(sessid)
-                                                a = cursor.fetchall()
-                                                session_id = a[-1][0] + 1
-                                                cursor = mydb.cursor()
+                                                # sessid = "SELECT session_id FROM screens_as"
+                                                # cursor.execute(sessid)
+                                                # a = cursor.fetchall()
+                                                # session_id = a[-1][0] + 1
+                                                # cursor = mydb.cursor()
                                                 insertsession = "INSERT INTO movie_sessions VALUES (%s, %s, %s, %s)"
                                                 values = (session_id, intgerslot, moviedate1, int(theatre_id))
                                                 cursor.execute(insertsession, values)

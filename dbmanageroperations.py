@@ -3,13 +3,15 @@ from tkinter.ttk import *
 from tkinter import messagebox, ttk
 import mysql.connector
 
+PASSWORD = "nuri"
+DATABASE_NAME = "movie_db2"
+
 mydb = mysql.connector.connect(
     host="127.0.0.1",
     user="root",
-    password="Devrim1-",
-    database="new_schema"
+    password=PASSWORD,
+    database=DATABASE_NAME
 )
-
 def dbmanageroptions():
     optionpage = Toplevel()
     optionpage.title("Database Manager Main Menu")
@@ -31,10 +33,10 @@ def dbmanageroptions():
                                 command=open_rating_audience)
     viewmoviesofdirector = Button(optionpage,
                                   text="View Movies of Director",
-                                  command=view_movies_ofdirector)
+                                  command=open_directors_movies)
     viewavgrating = Button(optionpage,
                            text="View Average Rating of a Movie",
-                           command=view_avg_rating)
+                           command=open_average_rating)
     adduserbutton.pack(pady= 10)
     deleteaudiencebutton.pack(pady=10)
     updateplatformbutton.pack(pady=10)
@@ -277,6 +279,12 @@ def open_rating_audience():
     btn_enter_rating_username.pack()
 
 def get_rating_audience(username):
+    mydb = mysql.connector.connect(
+        host="127.0.0.1",
+        user="root",
+        password=PASSWORD,
+        database=DATABASE_NAME
+    )
     try:
         cursor = mydb.cursor()
         rating = "select movie.movie_id, movie_name, rating from movie inner join ratings on movie.movie_id = ratings.movie_id where ratings.username = %s"
@@ -311,24 +319,133 @@ def get_rating_audience(username):
         messagebox.showerror("Database", f"User not found!")
 
 #view all movies of a director ui page
-def view_movies_ofdirector():
+def open_directors_movies():
     form_window = Toplevel()
-    form_window.title("View Moview of Director")
+    form_window.title( "View All Movies of a Director")
     form_window.geometry("400x400")
 
-    lbl_dirusername = Label(form_window, text="Username:")
-    lbl_dirusername.pack()
-    entry_dirusername = Entry(form_window)
-    entry_dirusername.pack()
+    lbl_username = Label(form_window, text="Director Username:")
+    lbl_username.pack()
+    entry_username = Entry(form_window)
+    entry_username.pack()
 
-#view avg rating of a movie ui
-def view_avg_rating():
+    btn_directors_movies = Button(form_window, text=f"View All Movies", command=lambda : view_directors_movies(entry_username.get()))
+    btn_directors_movies.pack()
+
+
+
+#Function to delete audience
+def view_directors_movies(directors_username):
+    cursor = mydb.cursor()
+    # get all movie id's of the given author
+    sql = "select movie_id, movie_name from Movie where username = %s"
+    cursor.execute(sql, (directors_username, ))
+    movie_ids_names = cursor.fetchall()
+    for idx, movie_id in enumerate(movie_ids_names):
+        movie_id = movie_ids_names[idx][0]
+        # get session id to fetch the theatre id and other attributes
+        sql = "select session_id from screens_as where movie_id = %s"
+        cursor.execute(sql, (movie_id, ))
+        session_id = cursor.fetchall()[0]
+
+        # add theatre id
+        sql = "select theatre_id, time_slot from Movie_Sessions where session_id = %s"
+        cursor.execute(sql, (session_id[0], ))
+        theatre_id, time_slot = cursor.fetchall()[0]
+        movie_ids_names[idx] += (theatre_id, )
+
+        # add theatre district
+        sql = "select theatre_district from Theatre where theatre_id = %s"
+        cursor.execute(sql, (theatre_id, ))
+        theatre_district = cursor.fetchall()[0]
+        movie_ids_names[idx] += (theatre_district, )
+        movie_ids_names[idx] += (time_slot, )
+
+
+    myview = Toplevel()
+    trv = ttk.Treeview(myview, selectmode="browse")
+    trv.grid(row=1, column=1, padx=20, pady=20)
+
+    # number of columns
+    trv["columns"] = ("1", "2", "3", "4", "5")
+
+    # Defining heading
+    trv['show'] = 'headings'
+
+    # width of columns and alignment
+    trv.column("1", width=80, anchor='c')
+    trv.column("2", width=100, anchor='c')
+    trv.column("3", width=80, anchor='c')
+    trv.column("4", width=100, anchor='c')
+    trv.column("5", width=80, anchor='c')
+    # Headings
+    # respective columns
+    trv.heading("1", text="movie_id")
+    trv.heading("2", text="movie_name")
+    trv.heading("3", text="theatre_id")
+    trv.heading("4", text="district")
+    trv.heading("5", text="time_slot")
+
+    for i in movie_ids_names:
+        trv.insert("", 'end', iid=i[0], text=i[0],
+                   values=i)
+    myview.mainloop()
+
+# view avg rating of a movie ui
+def open_average_rating():
     form_window = Toplevel()
-    form_window.title("View Average Rating")
+    form_window.title("View Average Rating of a Movie")
     form_window.geometry("400x400")
 
-    lbl_movieid = Label(form_window, text="Movie ID")
-    lbl_movieid.pack()
-    entry_lbl_movieid = Entry(form_window)
-    entry_lbl_movieid.pack()
+    lbl_rating_movie_id = Label(form_window, text="Movie Id:")
+    lbl_rating_movie_id.pack()
+    entry_lbl_rating_movie_id = Entry(form_window)
+    entry_lbl_rating_movie_id.pack()
 
+    btn_enter_overall_rating = Button(form_window, text="View Overall Rating", command=lambda: average_rating(entry_lbl_rating_movie_id.get()))
+    btn_enter_overall_rating.pack()
+
+def average_rating(movie_id):
+    mydb = mysql.connector.connect(
+        host="127.0.0.1",
+        user="root",
+        password=PASSWORD,
+        database=DATABASE_NAME
+    )
+    cursor = mydb.cursor()
+    sql = "select * from average_ratings where movie_id = %s"
+    values = (movie_id,)
+    try:
+        cursor.execute(sql, values)
+        movie_id, avg_rating = cursor.fetchall()[0]
+        movie_name_sql = "select movie_name from Movie where movie_id = %s"
+        values = (movie_id,)
+        cursor.execute(movie_name_sql, values)
+        movie_name = cursor.fetchall()[0][0]
+        results = [[movie_id, movie_name, avg_rating]]
+
+        myview = Toplevel()
+        trv = ttk.Treeview(myview, selectmode="browse")
+        trv.grid(row=1, column=1, padx=20, pady=20)
+
+        # number of columns
+        trv["columns"] = ("1", "2", "3")
+
+        # Defining heading
+        trv['show'] = 'headings'
+
+        # width of columns and alignment
+        trv.column("1", width=80, anchor='c')
+        trv.column("2", width=100, anchor='c')
+        trv.column("3", width=80, anchor='c')
+        # Headings
+        # respective columns
+        trv.heading("1", text="movie_id")
+        trv.heading("2", text="movie_name")
+        trv.heading("3", text="rating")
+        for i in results:
+            trv.insert("", 'end', iid=i[0], text=i[0],
+                       values=(i[0], i[1], i[2],))
+        myview.mainloop()
+    except:
+        messagebox.showerror("Database", f"Invalid Movie ID!")
