@@ -27,7 +27,6 @@ mydb = mysql.connector.connect(
     user="root",
     password=PASSWORD,
     database=DATABASE_NAME
-)
 ).
 ```
 
