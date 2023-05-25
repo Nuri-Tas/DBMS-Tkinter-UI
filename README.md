@@ -1,13 +1,31 @@
 # DBMS-Tkinter-UI
 
-The default MYSQL connection credentials are given below and they shall be changed according to the user credentials:
+That is how the directory should look like 
 
-`mydb = mysql.connector.connect(
+```
+${ROOT}
+├── firstpage.py
+├── audienceoperations.py
+├── dbmanageroperations.py
+├── directoroperations.py
+├── createTables.sql
+├── insertTables.sql
+├── dropTables.sql
+```
+
+`createTables.sql` and `dropTables.sql` files must be run to set up the database. 
+
+The default MYSQL connection credentials are given below and they shall be changed according to the user credentials on all .py files (firstpage.py, dbmanageroperations.py, directoroperations.py, audienceope:
+
+`PASSWORD = "nuri"
+DATABASE_NAME = "movie_db2"
+
+mydb = mysql.connector.connect(
     host="127.0.0.1",
     user="root",
-    password="nuri",
-    database="movie_db"
+    password=PASSWORD,
+    database=DATABASE_NAME
+)
 ).`
 
-`createTables.sql` and `insertTables.sql` files must be run to set up the database. The default name of the database is `movie_db`.
 
