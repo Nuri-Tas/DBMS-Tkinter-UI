@@ -15,9 +15,11 @@ ${ROOT}
 
 `createTables.sql` and `dropTables.sql` files must be run to set up the database. 
 
-The default MYSQL connection credentials are given below and they shall be changed according to the user credentials on all .py files (firstpage.py, dbmanageroperations.py, directoroperations.py, audienceope:
+The default MYSQL connection credentials are given below and they shall be changed according to the user credentials on all .py files (`firstpage.py, dbmanageroperations.py, directoroperations.py, audience.py`):
 
-`PASSWORD = "nuri"
+
+```
+PASSWORD = "nuri"
 DATABASE_NAME = "movie_db2"
 
 mydb = mysql.connector.connect(
@@ -26,6 +28,7 @@ mydb = mysql.connector.connect(
     password=PASSWORD,
     database=DATABASE_NAME
 )
-).`
+).
+```
 
 
