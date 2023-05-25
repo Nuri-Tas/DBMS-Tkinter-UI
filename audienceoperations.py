@@ -4,11 +4,14 @@ from tkinter import messagebox, ttk
 import mysql.connector
 import os 
 
+PASSWORD = "nuri"
+DATABASE_NAME = "movie_db2"
+
 mydb = mysql.connector.connect(
     host="127.0.0.1",
     user="root",
-    password="nuri",
-    database="movie_db2"
+    password=PASSWORD,
+    database=DATABASE_NAME
 )
 
 def validate_login_audience(username, password):
