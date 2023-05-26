@@ -1,6 +1,6 @@
 # DBMS-Tkinter-UI
 
-That is how the directory should look like 
+That is how the directory should look like: 
 
 ```
 ${ROOT}
@@ -13,7 +13,7 @@ ${ROOT}
 ├── dropTables.sql
 ```
 
-`createTables.sql` and `dropTables.sql` files must be run to set up the database. 
+`createTables.sql` and `insertTables.sql` files must be run to set up the database. 
 
 The default MYSQL connection credentials are given below and they shall be changed according to the user credentials on all .py files (`firstpage.py, dbmanageroperations.py, directoroperations.py, audience.py`):
 
