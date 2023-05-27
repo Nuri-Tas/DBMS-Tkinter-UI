@@ -242,6 +242,6 @@ def view_bought_tickets():
     trv.heading("5", text="average rating")
 
     for i in results:
-        trv.insert("", 'end', iid=i[0], text=i[0],
+        trv.insert("", 'end', iid=i[2], text=i[2],
                    values=i)
     myview.mainloop()    
