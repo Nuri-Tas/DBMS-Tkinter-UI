@@ -42,3 +42,5 @@ It suffices to run only the `firstpage.py` to open the UI after setting up the d
 
 `{path_to_the_directory} python firstpage.py`
 
+You can then travel back and forth between different features of UI. Tkinter windows will keep remaining open and will not automatically close. You may encounter error message boxes upon attempting invalid operations such as entering a wrong date format or trying to log into directors' servers with an audience's username.
+
