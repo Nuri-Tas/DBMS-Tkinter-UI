@@ -84,73 +84,80 @@ def get_slot():
 def listavailabletheatre(slot, date1):
     try:
         intgrslot = int(slot)
-        if intgrslot not in range(1,5):
-            messagebox.showerror("Slot Error", "Slots need to be numbers between 1-4.")
+        if intgrslot not in range(1, 5):
+            messagebox.showerror("Available Theatres", "Slot must be between 1 and 4")
         else:
             try:
-            #buraya sql kodu gelecek
                 moviedate = date1.split("/")
                 year = int(moviedate[0])
                 month = int(moviedate[1])
                 day = int(moviedate[2])
                 moviedate1 = date(year, month, day)
-                cursor = mydb.cursor()
-                rating = "SELECT theatre_id FROM movie_sessions WHERE time_slot = %s and _date = %s"
-                values = (intgrslot, moviedate1)
-                cursor.execute(rating, values)
-                occupiedslot = cursor.fetchall()
-                occupiedlist = []
-                for i in occupiedslot:
-                    occupiedlist.append(i[0])
-
-                cursor = mydb.cursor()
-                selecttheatre = "SELECT theatre_id, theatre_district, theatre_capacity from theatre"
-                cursor.execute(selecttheatre)
-                alltheatre = cursor.fetchall()
-                alltlist = []
-                for i in alltheatre:
-                    alltlist.append(i[0])
-
-                for a in occupiedlist:
-                    for b in alltlist:
-                        if a == b:
-                            alltlist.remove(b)
-                finallist = []
-                for c in alltlist:
+                try:
                     cursor = mydb.cursor()
-                    finalize = "SELECT theatre_id, theatre_district, theatre_capacity from theatre WHERE theatre_id = %s"
-                    values = (c,)
-                    cursor.execute(finalize, values)
-                    truet = cursor.fetchall()
-                    finallist.append(truet[0])
-                myview = Toplevel()
-                trv = ttk.Treeview(myview, selectmode="browse")
-                trv.grid(row=1, column=1, padx=20, pady=20)
+                    selecttheatre = "SELECT theatre_id, theatre_district, theatre_capacity from theatre"
+                    cursor.execute(selecttheatre)
+                    alltheatre = cursor.fetchall()
+                    alltlist = []
+                    for i in alltheatre:
+                        theatre_id = i[0]
+                        sql = """select max(time_slot) from sessions_view s
+                                    where s.theatre_id = %s and s._date = %s and time_slot <= %s"""
+                        b = (theatre_id, moviedate1, intgrslot)
+                        cursor.execute(sql, b)
+                        try:
+                            previous_slot = cursor.fetchall()[0][0]
 
-                # number of columns
-                trv["columns"] = ("1", "2", "3")
+                            sql = """select duration from sessions_view s
+                                    where s.theatre_id = %s and s._date = %s and time_slot = %s"""
+                            cursor.execute(sql, (theatre_id, moviedate1, previous_slot))
+                            previous_duration = cursor.fetchall()[0][0]
 
-                # Defining heading
-                trv['show'] = 'headings'
+                            if intgrslot >= (previous_slot + previous_duration):
+                                alltlist.append(i[0])
+                        except:
+                            alltlist.append(i[0])
 
-                # width of columns and alignment
-                trv.column("1", width=80, anchor='c')
-                trv.column("2", width=100, anchor='c')
-                trv.column("3", width=80, anchor='c')
-                # Headings
-                # respective columns
-                trv.heading("1", text="Theatre ID")
-                trv.heading("2", text="Theatre District")
-                trv.heading("3", text="Theatre Capacity")
-                for i in finallist:
-                    trv.insert("", 'end', iid=i[0], text=i[0],
-                               values=(i[0], i[1], i[2],))
-                myview.mainloop()
+                        finallist = []
+                        for c in alltlist:
+                            cursor = mydb.cursor()
+                            finalize = "SELECT theatre_id, theatre_district, theatre_capacity from theatre WHERE theatre_id = %s"
+                            values = (c,)
+                            cursor.execute(finalize, values)
+                            truet = cursor.fetchall()
+                            finallist.append(truet[0])
+
+                    myview = Toplevel()
+                    trv = ttk.Treeview(myview, selectmode="browse")
+                    trv.grid(row=1, column=1, padx=20, pady=20)
+
+                    # number of columns
+                    trv["columns"] = ("1", "2", "3")
+
+                    # Defining heading
+                    trv['show'] = 'headings'
+
+                    # width of columns and alignment
+                    trv.column("1", width=80, anchor='c')
+                    trv.column("2", width=100, anchor='c')
+                    trv.column("3", width=80, anchor='c')
+                    # Headings
+                    # respective columns
+                    trv.heading("1", text="Theatre ID")
+                    trv.heading("2", text="Theatre District")
+                    trv.heading("3", text="Theatre Capacity")
+                    for i in finallist:
+                        trv.insert("", 'end', iid=i[0], text=i[0],
+                                   values=(i[0], i[1], i[2],))
+                    myview.mainloop()
+                except:
+                    pass
             except:
-                messagebox.showerror("Date Error", "Date is not in the right format.")
+                messagebox.showerror("Available Theatres", "Date must be in the YYYY/MM/DD format!")
     except:
-        messagebox.showerror("Slot Error", "Slot needs to be an integer!")
+        messagebox.showerror("Available Theatres", "Slot must be integer")
 
+   
 def addmovie():
     form_window = Toplevel()
     form_window.title("Add Movie")
