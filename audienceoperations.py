@@ -168,6 +168,12 @@ def view_all_movies():
 
 
 def view_bought_tickets():
+    mydb = mysql.connector.connect(
+    host="127.0.0.1",
+    user="root",
+    password=PASSWORD,
+    database=DATABASE_NAME)
+    
     audience_username = os.environ.get("AUDIENCE_USERNAME")
     cursor = mydb.cursor()
     # get all session id's bought by the user
