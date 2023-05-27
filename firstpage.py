@@ -5,7 +5,7 @@ from tkinter import *
 from tkinter.ttk import *
 from tkinter import messagebox
 import mysql.connector
-from dbmanageroperations2 import dbmanageroptions
+from dbmanageroperations import dbmanageroptions
 from directoroperations import validate_login_director
 from audienceoperations import validate_login_audience
 import os
