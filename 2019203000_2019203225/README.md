@@ -11,6 +11,7 @@ ${ROOT}
 ├── createTables.sql
 ├── insertTables.sql
 ├── dropTables.sql
+├── README.md
 ```
 
 `createTables.sql` and `insertTables.sql` files must be run to set up the database. 
